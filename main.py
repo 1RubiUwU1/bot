@@ -1,28 +1,21 @@
-from flask import Flask, request, jsonify
-import json
+from flask import Flask, request
+import requests
 
 app = Flask(__name__)
-archivo_url = 'url_ngrok.json'
 
-@app.route('/actualizar_url', methods=['POST'])
-def actualizar_url():
-    data = request.get_json()
-    url = data.get("url")
-    if not url:
-        return jsonify({"error": "Falta el campo 'url'"}), 400
-    
-    with open(archivo_url, 'w') as f:
-        json.dump({"url": url}, f)
-    return jsonify({"mensaje": "URL actualizada correctamente"}), 200
+WEBHOOK_URL = "https://discord.com/api/webhooks/1387516322941894686/EwHdpFHRis-BkgFLh7f9tHUBUB3REd_-qcr9yHgT4aaZu3CSs0NhH266LBAOmB8cKftB"
 
-@app.route('/obtener_url', methods=['GET'])
-def obtener_url():
-    try:
-        with open(archivo_url, 'r') as f:
-            data = json.load(f)
-        return jsonify(data), 200
-    except FileNotFoundError:
-        return jsonify({"error": "URL no encontrada"}), 404
+@app.route("/enviar", methods=["GET"])
+def enviar():
+    mensaje = request.args.get("mensaje", "Mensaje vacío desde GET")
 
-if __name__ == '__main__':
-    app.run(port=5001)
+    contenido = {
+        "content": mensaje,
+        "username": "Webhook desde GET"
+    }
+
+    resp = requests.post(WEBHOOK_URL, json=contenido)
+    return "✅ Mensaje enviado a Discord via GET", 200
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
