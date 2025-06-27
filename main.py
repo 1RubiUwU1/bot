@@ -3,7 +3,7 @@ import requests
 
 app = Flask(__name__)
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1387516322941894686/EwHdpFHRis-BkgFLh7f9tHUBUB3REd_-qcr9yHgT4aaZu3CSs0NhH266LBAOmB8cKftB"
+WEBHOOK_URL = "https://discord.com/api/webhooks/1387516322941894686/EwHdpFHR-qcr9yHgT4aaZu3CSs0NhH266LBAOmB8cKftB"
 
 @app.route("/enviar", methods=["GET"])
 def enviar():
