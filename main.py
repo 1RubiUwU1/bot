@@ -45,7 +45,7 @@ def buscar(plataforma):
 
 # --- RUTAS ---
 
-@app.route("/notificar", methods=["GET"])
+@app.route("/enviar", methods=["GET"])
 def notificar():
     """Manda notificación a Discord"""
     noti = request.args.get("noti")
