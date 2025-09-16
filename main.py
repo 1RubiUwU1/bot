@@ -9,7 +9,26 @@ CORS(app)  # habilita CORS para todos los dominios
 # ========= CONFIG =========
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1406707343542190112/zUuMvY2ZytelLwyLqq8oq_D-AHxlh4-gYR4M8nim_qxcgoZdRrG0iEKgaJ2zKoYgoYIk"
 URL = "https://raw.githubusercontent.com/skrifna4-lab/base/refs/heads/main/db.txt"
+exel = "https://script.google.com/macros/s/AKfycbxQVjyF32GLYkBYIwI0XbIVKL4oDXZPva0gL0U_9ADKPpj_IlFhB-wEks3j0dwMioMP/exec"
 # ==========================
+def subir_comentario(nombre, monto):
+    data = {
+        'nombre': nombre,
+        'monto': monto,
+    }
+    try:
+        response = requests.post(exel, data=data)
+        print("Respuesta Google:", response.text)  # debería mostrar {"success": true}
+    except Exception as e:
+        print("Error al enviar:", str(e))
+   
+def pufificador(texto):
+    mensaje = texto.split("|")[2]
+    info = mensaje.split("-")[1].strip().split("te envió un pago por")
+    nombre = info[0].strip()
+    monto = info[1].split(".")[0].replace("S/ ", "").strip()
+
+    return nombre, monto
 
 # --- Funciones auxiliares ---
 def from_base64(base64_texto: str) -> str:
@@ -44,6 +63,7 @@ def buscar(plataforma):
     return resultados
 
 # --- RUTAS ---
+#📢 Notificación recibida: |com.bcp.innovacxion.yapeapp|Confirmación de Pago - Rosa Espetia T. te envió un pago por S/ 1. El cód. de seguridad es: 313|
 
 @app.route("/enviar", methods=["GET"])
 def notificar():
@@ -52,6 +72,9 @@ def notificar():
     if not noti:
         return jsonify({"success": False, "error": "Falta parámetro 'noti'"}), 400
 
+    
+    nom, mon = pufificador(noti)
+    subir_comentario(nom, mon)
     data = {"content": f"📢 Notificación recibida: {noti}"}
     try:
         r = requests.post(DISCORD_WEBHOOK_URL, json=data)
