@@ -72,10 +72,17 @@ def notificar():
     if not noti:
         return jsonify({"success": False, "error": "Falta parámetro 'noti'"}), 400
 
-    
-    nom, mon = pufificador(noti)
-    subir_comentario(nom, mon)
-    data = {"content": f"📢 Notificación recibida: {noti}"}
+    noti = "|com.bcp.innovacxion.yapeapp|Confirmaci de Pago - Leisel M. Dolmos A. te envi\u00f3 un pago por S/ 12. El c\u00f3d. de seguridad es: 044|"
+
+    a = noti.split("|")
+    b = a[1]
+    if (b == "com.bcp.innovacxion.yapeapp"):
+        nom, mon = pufificador(noti)
+        subir_comentario(nom, mon)
+        data = {"content": f"📢 Notificación recibida: {noti}"}
+    else:
+        data = {"content": f"📢 Notificación recibida: {noti}"}
+
     try:
         r = requests.post(DISCORD_WEBHOOK_URL, json=data)
         r.raise_for_status()
