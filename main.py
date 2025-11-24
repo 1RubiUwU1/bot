@@ -65,7 +65,7 @@ def buscar(plataforma):
 # --- RUTAS ---
 #📢 Notificación recibida: |com.bcp.innovacxion.yapeapp|Confirmación de Pago - Rosa Espetia T. te envió un pago por S/ 1. El cód. de seguridad es: 313|
 
-@app.route("/enviar", methods=["GET"])
+@app.route("/yape", methods=["GET"])
 def notificar():
     """Manda notificación a Discord"""
     noti = request.args.get("noti")
@@ -112,3 +112,4 @@ def cuentas():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
