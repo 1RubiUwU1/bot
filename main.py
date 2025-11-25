@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)  # Habilita CORS para todos los dominios
 
 # ========= CONFIG =========
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1406707343542190112/zUuMvY2ZytelLwyLqq8oq_D-AHxlh4-gYR4M8nim_qxcgoZdRrG0iEKgaJ2zKoYgoYIk"
+DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
 URL = "https://raw.githubusercontent.com/skrifna4-lab/base/refs/heads/main/db.txt"
 exel = "https://script.google.com/macros/s/AKfycbxQVjyF32GLYkBYIwI0XbIVKL4oDXZPva0gL0U_9ADKPpj_IlFhB-wEks3j0dwMioMP/exec"
 # ==========================
@@ -165,3 +165,4 @@ def cuentas():
 # -----------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
