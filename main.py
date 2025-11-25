@@ -55,18 +55,30 @@ def pufificador(msg):
         return None, None
 
 # -----------------------
-# Convierte el monto a palabras
-# -----------------------
 def monto_a_palabras(monto_str):
-    """Convierte el monto a palabras: 1->'un sol', 6->'seis soles', etc."""
+    """Convierte un monto tipo '12.50' a palabras: 'doce soles con cincuenta céntimos'"""
     try:
         monto = float(monto_str)
         entero = int(monto)
-        if entero == 1:
-            return "un sol"
+        decimales = round((monto - entero) * 100)  # parte decimal como entero (0-99)
+
+        partes = []
+
+        # Parte entera
+        if entero == 0:
+            partes.append("cero")
+        elif entero == 1:
+            partes.append("un sol")
         else:
-            return f"{num2words(entero, lang='es')} soles"
-    except:
+            partes.append(f"{num2words(entero, lang='es')} soles")
+
+        # Parte decimal
+        if decimales > 0:
+            partes.append(f"con {num2words(decimales, lang='es')} céntimos")
+
+        return " ".join(partes)
+    except Exception as e:
+        print("Error en monto_a_palabras:", e)
         return f"{monto_str} soles"
 
 # -----------------------
@@ -167,6 +179,7 @@ def cuentas():
 # -----------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
 
 
 
