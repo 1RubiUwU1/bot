@@ -188,10 +188,40 @@ def proxy(path):
     except requests.exceptions.RequestException as e:
         return {"error": "No se pudo conectar al servidor", "details": str(e)}, 500
 
+TARGET_P2 = "http://185.16.39.160:5026"
+
+@app.route("/p2/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+def proxy_p2(path):
+    try:
+        url = f"{TARGET_P2}/{path}"
+        headers = {k: v for k, v in request.headers if k.lower() != "host"}
+
+        resp = requests.request(
+            method=request.method,
+            url=url,
+            headers=headers,
+            params=request.args,
+            data=request.get_data(),
+            cookies=request.cookies,
+            stream=True
+        )
+
+        response = Response(resp.raw, status=resp.status_code)
+        excluded_headers = ['content-encoding', 'transfer-encoding', 'connection']
+        for key, value in resp.headers.items():
+            if key.lower() not in excluded_headers:
+                response.headers[key] = value
+
+        return response
+
+    except requests.exceptions.RequestException as e:
+        return {"error": "No se pudo conectar al servidor", "details": str(e)}, 500
+
 
 # -----------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
 
 
 
