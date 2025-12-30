@@ -155,6 +155,48 @@ def verificar():
     existe = verificar_pago(nombre, monto)
     return jsonify({"success": True, "existe": existe, "mensaje": f"{nombre} {'ya pagó' if existe else 'no ha pagado'}"})
 
+TARGET = "http://may1.soymaycol.icu:10002"
+
+# Proxy genérico: captura cualquier ruta
+@app.route("/<path:path>", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"])
+def proxy(path):
+    try:
+        # Construimos la URL destino
+        url = f"{TARGET}/{path}"
+
+        # Reenvío de headers (excepto Host)
+        headers = {key: value for key, value in request.headers if key.lower() != "host"}
+
+        # Llamada al servidor real
+        resp = requests.request(
+            method=request.method,
+            url=url,
+            headers=headers,
+            params=request.args,
+            data=request.get_data(),
+            cookies=request.cookies,
+            stream=True  # para videos, imágenes, binarios
+        )
+
+        # Creamos la respuesta para el cliente
+        response = Response(resp.raw, status=resp.status_code)
+        # Reenviamos headers importantes
+        excluded_headers = ['content-encoding', 'transfer-encoding', 'connection']
+        for key, value in resp.headers.items():
+            if key.lower() not in excluded_headers:
+                response.headers[key] = value
+
+        return response
+
+    except requests.exceptions.RequestException as e:
+        return {"error": "No se pudo conectar al servidor", "details": str(e)}, 500
+
+# Opcional: ruta raíz
+@app.route("/")
+def index():
+    return {"info": "Proxy genérico corriendo. Envía cualquier ruta a /<path>"}
+
 # -----------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
+
