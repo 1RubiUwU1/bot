@@ -219,24 +219,39 @@ def proxy_p2(path):
     except requests.exceptions.RequestException as e:
         return {"error": "No se pudo conectar al servidor P2", "details": str(e)}, 500
 
-# Página raíz cargada directamente desde skrifna.uk
-@app.route("/", methods=["GET"])
-def root():
+# Proxy para la raíz y todos los recursos del sitio
+@app.route("/", defaults={"path": ""}, methods=["GET", "POST", "OPTIONS"])
+@app.route("/<path:path>", methods=["GET", "POST", "OPTIONS"])
+def proxy_root(path):
     try:
-        resp = requests.get(TARGET_ROOT, stream=True)
+        url = f"{TARGET_ROOT}/{path}"
+        headers = {k: v for k, v in request.headers if k.lower() != "host"}
+
+        resp = requests.request(
+            method=request.method,
+            url=url,
+            headers=headers,
+            params=request.args,
+            data=request.get_data(),
+            cookies=request.cookies,
+            stream=True
+        )
+
         response = Response(resp.raw, status=resp.status_code)
         excluded_headers = ['content-encoding', 'transfer-encoding', 'connection']
         for key, value in resp.headers.items():
             if key.lower() not in excluded_headers:
                 response.headers[key] = value
+
         return response
     except requests.exceptions.RequestException as e:
-        return {"error": "No se pudo cargar la página principal", "details": str(e)}, 500
+        return {"error": "No se pudo conectar al servidor principal", "details": str(e)}, 500
 
 # Evitar errores con favicon
 @app.route("/favicon.ico")
 def favicon():
     return "", 204
+
 # -----------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
